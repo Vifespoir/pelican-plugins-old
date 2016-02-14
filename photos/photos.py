@@ -7,6 +7,7 @@ from pelican import signals
 from pelican.utils import pelican_open
 from PIL import Image, ExifTags
 from itertools import chain
+from photos.portrait_to_paysage import portrait_to_paysage
 
 logger = logging.getLogger(__name__)
 queue_resize = dict()
@@ -14,7 +15,7 @@ hrefs = None
 
 
 def initialized(pelican):
-    p = os.path.expanduser('~/Pictures')
+    p = os.path.expanduser('~/github/blog/content/')
     from pelican.settings import DEFAULT_CONFIG
     DEFAULT_CONFIG.setdefault('PHOTO_LIBRARY', p)
     DEFAULT_CONFIG.setdefault('PHOTO_GALLERY', (1024, 768, 80))
@@ -65,6 +66,7 @@ def resize_photos(generator, writer):
                 os.path.getmtime(orig) > os.path.getmtime(resized)):
             logger.info('photos: make photo %s -> %s', orig, resized)
             im = Image.open(orig)
+            im = portrait_to_paysage(im)
             try:
                 exif = im._getexif()
             except Exception:
